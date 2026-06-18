@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cheesemation</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Trailer Modal -->
+    <div id="trailerModal" class="trailer-modal active">
+        <div class="trailer-container">
+            <video id="trailerVideo" class="trailer-video" controls>
+                <source src="trailer.mov" type="video/quicktime">
+                Your browser does not support the video tag.
+            </video>
+            <button id="skipTrailerBtn" class="skip-trailer-btn">Skip Trailer</button>
+        </div>
+    </div>
+
+    <nav>
+        <div class="studio-logo">
+            <img src="cheez-motion-logo.png" alt="CHEEZ MOTION" class="logo-image">
+        </div>
+        <div id="themeSelector" style="display: flex; gap: 6px; align-items: center;">
+            <button class="theme-btn active" data-theme="default" title="Dark" style="background: #2a2a2f; width: 28px; height: 28px; border-radius: 4px; border: 1px solid #3f3f4f; cursor: pointer; color: white; font-size: 11px;">🌙</button>
+            <button class="theme-btn" data-theme="cheese-dark" title="Cheese Dark" style="background: #3d2b1f; width: 28px; height: 28px; border-radius: 4px; border: 1px solid #5a4a3a; cursor: pointer; color: #f5e6d3; font-size: 11px;">🧀</button>
+            <button class="theme-btn" data-theme="cheese-light" title="Cheese Light" style="background: #f9f1e6; width: 28px; height: 28px; border-radius: 4px; border: 1px solid #d9c5a8; cursor: pointer; color: #3d2b1f; font-size: 11px;">🧀</button>
+            <button class="theme-btn" data-theme="blue-dark" title="Blue Dark" style="background: #1a2236; width: 28px; height: 28px; border-radius: 4px; border: 1px solid #2a3a52; cursor: pointer; color: #4a9eff; font-size: 11px;">🌊</button>
+            <button class="theme-btn" data-theme="blue-light" title="Blue Light" style="background: #dce5f5; width: 28px; height: 28px; border-radius: 4px; border: 1px solid #b8c5e0; cursor: pointer; color: #2970d5; font-size: 11px;">🌊</button>
+        </div>
+        <div id="playBadge" class="playback-badge">ENGINE PLAYBACK RUNNING</div>
+    </nav>
+
+    <div class="workspace-grid">
+        <div class="toolbar-sidebar">
+            <div class="tool-icon active" id="toolBrush" title="Vector Brush">🖌️</div>
+            <div class="tool-icon" id="toolEraser" title="Pixel Eraser">🧽</div>
+            <div class="tool-icon" id="toolSTEM" title="STEM Learning Mode">🧬</div>
+        </div>
+
+        <div class="stage-viewport">
+            <div class="canvas-stack">
+                <canvas id="onionSkinCanvas" width="640" height="480"></canvas>
+                <canvas id="gridOverlayCanvas" width="640" height="480"></canvas>
+                <canvas id="paintCanvas" width="640" height="480"></canvas>
+            </div>
+        </div>
+
+        <div class="inspector-sidebar">
+            <div id="stemModePanel" style="display:none; background:#1a1a1f; padding:15px; border-radius:8px; margin-bottom:15px; border:1px solid #3f3f4f;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <h3 style="margin:0; color:#2f80ed; font-size:14px;">📚 STEM Learning</h3>
+                    <button id="exitSTEMMode" style="background:#eb5757; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:11px;">Exit</button>
+                </div>
+                <div id="stemCoordinateDisplay" style="background:#2d2d38; padding:10px; border-radius:4px; margin-bottom:10px; border-left:2px solid #27ae60;">
+                    <strong style="color:#27ae60; font-size:10px;">Canvas Coordinates:</strong>
+                    <div id="stemCoords" style="color:#f2f2f2; font-size:14px; font-weight:600; margin-top:5px; font-family:monospace;">X: — Y: —</div>
+                </div>
+                <div id="stemChallengeSelector" style="display:grid; grid-template-columns:1fr; gap:6px; margin-bottom:10px; max-height:300px; overflow-y:auto;">
+                    <!-- Challenge buttons inserted here -->
+                </div>
+                <div id="stemChallengeInfo" style="display:none; max-height:400px; overflow-y:auto;">
+                    <h4 id="stemTitle" style="color:#2f80ed; margin:0 0 8px 0; font-size:13px;"></h4>
+                    <p id="stemDescription" style="color:#aaaaaa; margin:0 0 10px 0; font-size:11px; line-height:1.3;"></p>
+                    <div style="background:#2d2d38; padding:8px; border-radius:4px; margin:8px 0; border-left:2px solid #2f80ed;">
+                        <strong style="color:#f2994a; font-size:10px;">Formula:</strong>
+                        <code id="stemFormula" style="color:#f2994a; font-size:9px; display:block; margin-top:3px; word-break:break-all;"></code>
+                    </div>
+                    <div style="background:#2d2d38; padding:8px; border-radius:4px; border-left:2px solid #27ae60;">
+                        <strong style="color:#27ae60; font-size:10px;">Steps:</strong>
+                        <ol id="stemInstructions" style="color:#aaaaaa; font-size:10px; margin:5px 0 0 16px; padding:0;"></ol>
+                    </div>
+                    <div id="stemHintsContainer" style="background:#2d2d38; padding:8px; border-radius:4px; margin:8px 0; border-left:2px solid #eb5757; display:none;">
+                        <strong style="color:#eb5757; font-size:10px;">Helpful Questions:</strong>
+                        <ul id="stemHints" style="color:#aaaaaa; font-size:9px; margin:5px 0 0 16px; padding:0; line-height:1.4;"></ul>
+                    </div>
+                    <button id="toggleHints" style="background:#6c3d3d; color:#f2f2f2; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; margin-top:8px; width:100%; font-size:10px; display:none;">Show Hints</button>
+                    <button id="startChallenge" style="background:#27ae60; color:white; border:none; padding:8px 12px; border-radius:4px; cursor:pointer; margin-top:10px; width:100%; font-size:12px; font-weight:600;">Start Challenge</button>
+                    <button id="backToChallenges" style="background:#3f3f4f; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; margin-top:6px; width:100%; font-size:11px;">Back</button>
+                </div>
+            </div>
+            
+            <div class="inspector-group">
+                <label>Brush Dimension</label>
+                <input type="range" id="brushSize" min="1" max="50" value="5">
+            </div>
+
+            <div class="inspector-group">
+                <label>Swatch Matrices</label>
+                <div class="color-palette">
+                    <div class="color-swatch active" style="background:#141419" data-color="#141419"></div>
+                    <div class="color-swatch" style="background:#eb5757" data-color="#eb5757"></div>
+                    <div class="color-swatch" style="background:#f2994a" data-color="#f2994a"></div>
+                    <div class="color-swatch" style="background:#27ae60" data-color="#27ae60"></div>
+                    <div class="color-swatch" style="background:#2f80ed" data-color="#2f80ed"></div>
+                </div>
+            </div>
+
+            <div class="inspector-group">
+                <label>Developer Grid</label>
+                <div class="grid-toggle-row">
+                    <span>Enable View Grid Mapping</span>
+                    <input type="checkbox" id="gridToggle">
+                </div>
+            </div>
+
+            <div class="inspector-group keyframe-section">
+                <label>Keyframe Control</label>
+                <button class="action-btn primary" id="btnCapture">+ Append Keyframe</button>
+            </div>
+
+            <div class="inspector-group">
+                <label>Sequencer Execution</label>
+                <div class="fps-row">
+                    <span>Rate Speed Engine</span> <span id="fpsReadout">12 FPS</span>
+                </div>
+                <input type="range" id="fpsEngineSlider" min="1" max="24" value="12">
+                
+                <div class="flex-row">
+                    <button class="action-btn success" id="btnRunAnimation">▶ Play</button>
+                    <button class="action-btn danger" id="btnWipe">Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="timeline-dock">
+        <div class="timeline-meta">
+            <span>Linear Keyframe Sequencer Tracking Track</span>
+            <span id="frameStats">Total Assets: 0</span>
+        </div>
+        <div class="frame-strip" id="frameStripDeck"></div>
+    </div>
+
+    <script src="stem.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
